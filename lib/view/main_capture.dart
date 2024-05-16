@@ -1,8 +1,10 @@
 
 import 'package:flutter/material.dart';
+import 'package:myapp/view/dropdowncustom.dart';
+import 'package:myapp/view/estilotitulo.dart';
 
 class Capture extends StatefulWidget {
-  const Capture({Key? key}) : super(key: key);
+  const Capture({super.key});
 
   @override
   State<Capture> createState() => _CaptureState();
@@ -19,265 +21,248 @@ class _CaptureState extends State<Capture> {
   final _marginController = TextEditingController();
 
   // Dropdowns
-  String? _businessUnit;
-  String? _stage;
+  String? _businessUnit;  
   String? _type;
   String? _region;
   String? _territory;
   String? _industry;
+  String? _idsealer;
+
+  List<String> opcionesUnidadNegocio=[
+    'BU-01',
+    'BU-02',
+    'BU-03',
+    'BU-04',
+    'BU-05',
+    'BU-06',
+    'BU-07',
+    'BU-08',
+    'BU-09',
+    'BU-10',
+  ];
+  
+  List<String> tipos=[
+    'TY-00',
+    'TY-01',
+    'TY-02',
+    'TY-03',
+    'TY-04',
+    'TY-05',    
+  ];
+
+  List<String> regiones=[
+    'RE-00',
+    'RE-01',
+    'RE-02',
+    'RE-03',    
+  ];
+
+  List<String> territorios=[
+    'TE-00',
+    'TE-01',
+    'TE-02',
+    'TE-03',    
+    'TE-04',
+    'TE-05',
+    'TE-06',
+    'TE-07',
+    'TE-08',    
+  ];
+
+  List<String> industrias=[
+    'IN-00',
+    'IN-01',
+    'IN-02',
+    'IN-03',    
+    'IN-04',
+    'IN-05',
+    'IN-06',
+    'IN-07',
+    'IN-08',    
+    'IN-09',
+    'IN-10',
+  ];
+
+  List<String> vendedores=[
+    'NV-0',
+    'NV-1',
+    'NV-2',
+    'NV-3',    
+    'NV-4',    
+  ];
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Capture'),
+        title: const Text('TABD'),
       ),
-      body: Form(
-        key: _formKey,
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              // Client code text field
-              TextFormField(
-                controller: _clientCodeController,
-                decoration: const InputDecoration(
-                  labelText: 'Client Code',
+      body: SingleChildScrollView(
+        child: Form(
+          key: _formKey,
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              children: [
+                const SizedBox(height: 20,),
+                const EstiloTitulo(textoTitulo: 'Ingrese los datos'),      
+                const SizedBox(height: 30,),
+                // Client code text field
+                TextFormField(
+                  controller: _clientCodeController,
+                  decoration: const InputDecoration(
+                    labelText: 'Código de cliente',
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Por favor ingrese un código';
+                    }
+                    return null;
+                  },
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter a client code';
-                  }
-                  return null;
-                },
-              ),
+                // Business unit dropdown
+                DropDownCustom(
+                  listaDeOpciones: opcionesUnidadNegocio, 
+                  nombreColeccion: 'Unidad de negocio', 
+                  onSelectedValue: (value) {                          
+                           _businessUnit = value;                           
+                           setState(() {
+                             
+                           });
+            
+                          }, selectElement: _businessUnit,),
+                //DropDownCustom tipos
+                DropDownCustom(
+                  listaDeOpciones: tipos, 
+                  nombreColeccion: 'Tipo', 
+                  onSelectedValue: (value) {                          
+                           _type = value;                           
+                           setState(() {
+                             
+                           });
+            
+                          }, selectElement: _type,),
+                //DropDownCustom regiones
+                DropDownCustom(
+                  listaDeOpciones: regiones, 
+                  nombreColeccion: 'Región', 
+                  onSelectedValue: (value) {                          
+                           _region = value;                           
+                           setState(() {
+                             
+                           });
+            
+                          }, selectElement: _region,),
+                //DropDownCustom territorios
+                DropDownCustom(
+                  listaDeOpciones: territorios, 
+                  nombreColeccion: 'Territorio', 
+                  onSelectedValue: (value) {                          
+                           _territory = value;                           
+                           setState(() {
+                             
+                           });
+            
+                          }, selectElement: _territory),
 
-              // Business unit dropdown
-              DropdownButtonFormField<String>(
-                value: _businessUnit,
-                items: const [
-                  DropdownMenuItem(
-                    value: 'Unit 1',
-                    child: Text('Unit 1'),
-                  ),
-                  DropdownMenuItem(
-                    value: 'Unit 2',
-                    child: Text('Unit 2'),
-                  ),
-                ],
-                onChanged: (value) {
-                  setState(() {
-                    _businessUnit = value;
-                  });
-                },
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please select a business unit';
-                  }
-                  return null;
-                },
-              ),
+                //DropDownCustom industrias
+                DropDownCustom(
+                  listaDeOpciones: industrias, 
+                  nombreColeccion: 'Industria', 
+                  onSelectedValue: (value) {                          
+                           _industry = value;                           
+                           setState(() {
+                             
+                           });
+            
+                          }, selectElement: _industry),
+                //DropDownCustom vendedores
+                DropDownCustom(
+                  listaDeOpciones: vendedores, 
+                  nombreColeccion: 'Vendedor', 
+                  onSelectedValue: (value) {                          
+                           _idsealer = value;                           
+                           setState(() {
+                             
+                           });
+            
+                          }, selectElement: _idsealer),
 
-              // Stage dropdown
-              DropdownButtonFormField<String>(
-                value: _stage,
-                items: const [
-                  DropdownMenuItem(
-                    value: 'Stage 1',
-                    child: Text('Stage 1'),
+                
+        
+                // ACV text field
+                TextFormField(
+                  controller: _acvController,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(
+                    labelText: 'ACV',
                   ),
-                  DropdownMenuItem(
-                    value: 'Stage 2',
-                    child: Text('Stage 2'),
-                  ),
-                ],
-                onChanged: (value) {
-                  setState(() {
-                    _stage = value;
-                  });
-                },
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please select a stage';
-                  }
-                  return null;
-                },
-              ),
-
-              // Type dropdown
-              DropdownButtonFormField<String>(
-                value: _type,
-                items: const [
-                  DropdownMenuItem(
-                    value: 'Type 1',
-                    child: Text('Type 1'),
-                  ),
-                  DropdownMenuItem(
-                    value: 'Type 2',
-                    child: Text('Type 2'),
-                  ),
-                ],
-                onChanged: (value) {
-                  setState(() {
-                    _type = value;
-                  });
-                },
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please select a type';
-                  }
-                  return null;
-                },
-              ),
-
-              // ACV text field
-              TextFormField(
-                controller: _acvController,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  labelText: 'ACV',
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter an ACV';
+                    }
+                    return null;
+                  },
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter an ACV';
-                  }
-                  return null;
-                },
-              ),
-
-              // Years text field
-              TextFormField(
-                controller: _yearsController,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  labelText: 'Years',
+        
+                // Years text field
+                TextFormField(
+                  controller: _yearsController,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(
+                    labelText: 'Años',
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter the number of years';
+                    }
+                    return null;
+                  },
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter the number of years';
-                  }
-                  return null;
-                },
-              ),
-
-              // TCV text field
-              TextFormField(
-                controller: _tcvController,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  labelText: 'TCV',    
+        
+                // TCV text field
+                TextFormField(
+                  controller: _tcvController,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(
+                    labelText: 'TCV',    
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter a TCV';
+                    }
+                    return null;
+                  },
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter a TCV';
-                  }
-                  return null;
-                },
-              ),
-
-              // Margin text field
-              TextFormField(
-                controller: _marginController,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  labelText: 'Margin',
+        
+                // Margin text field
+                TextFormField(
+                  controller: _marginController,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(
+                    labelText: 'Margen',
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter a margin';
+                    }
+                    return null;
+                  },
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter a margin';
-                  }
-                  return null;
-                },
-              ),
-
-              // Region dropdown
-              DropdownButtonFormField<String>(
-                value: _region,
-                items: const [
-                  DropdownMenuItem(
-                    value: 'Region 1',
-                    child: Text('Region 1'),
-                  ),
-                  DropdownMenuItem(
-                    value: 'Region 2',
-                    child: Text('Region 2'),
-                  ),
-                ],
-                onChanged: (value) {
-                  setState(() {
-                    _region = value;
-                  });
-                },
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please select a region';
-                  }
-                  return null;
-                },
-              ),
-
-              // Territory dropdown
-              DropdownButtonFormField<String>(
-                value: _territory,
-                items: const [
-                  DropdownMenuItem(
-                    value: 'Territory 1',
-                    child: Text('Territory 1'),
-                  ),
-                  DropdownMenuItem(
-                    value: 'Territory 2',
-                    child: Text('Territory 2'),
-                  ),
-                ],
-                onChanged: (value) {
-                  setState(() {
-                    _territory = value;
-                  });
-                },
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please select a territory';
-                  }
-                  return null;
-                },
-              ),
-
-              // Industry dropdown
-              DropdownButtonFormField<String>(
-                value: _industry,
-                items: const [
-                  DropdownMenuItem(
-                    value: 'Industry 1',
-                    child: Text('Industry 1'),
-                  ),
-                  DropdownMenuItem(
-                    value: 'Industry 2',
-                    child: Text('Industry 2'),
-                  ),
-                ],
-                onChanged: (value) {
-                  setState(() {
-                    _industry = value;
-                  });
-                },
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please select an industry';
-                  }
-                  return null;
-                },
-              ),
-
-              // Submit button
-              ElevatedButton(
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    // Process the form data
-                  }
-                },
-                child: const Text('Submit'),
-              ),
-            ],
+        
+                const SizedBox(height: 20,),
+                // Submit button
+                ElevatedButton(
+                  onPressed: () {
+                    if (_formKey.currentState!.validate()) {
+                      // Process the form data
+                    }
+                  },
+                  child: const Text('Guardar Datos'),
+                ),
+              ],
+            ),
           ),
         ),
       ),

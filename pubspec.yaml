@@ -30,11 +30,16 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
+  #Librerías para conectar a mongodb
+  mongo_dart: ^0.8.0
+# Suggested code may be subject to a license. Learn more: ~LicenseLog:2433042971.
+  realm: ^2.2.1  
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.6
+  dotenv: ^4.2.0
+  flutter_dotenv: ^5.1.0
 
 dev_dependencies:
   flutter_test:

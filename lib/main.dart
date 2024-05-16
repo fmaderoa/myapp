@@ -1,10 +1,13 @@
 
 import 'package:flutter/material.dart';
 import 'package:myapp/view/main_capture.dart';
+// Suggested code may be subject to a license. Learn more: ~LicenseLog:1824201399.
+// Suggested code may be subject to a license. Learn more: ~LicenseLog:1401296617.
+import 'package:flutter_dotenv/flutter_dotenv.dart';  
 
 
-
-void main() {
+Future<void> main() async {
+  
   runApp(const MyApp());
 }
 class MyApp extends StatelessWidget {
@@ -13,7 +16,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Captura Modelo Comercial',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
