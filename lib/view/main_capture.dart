@@ -4,6 +4,7 @@ import 'package:myapp/data/savedata.dart';
 import 'package:myapp/model/commercial_opportunity.dart';
 import 'package:myapp/view/dropdowncustom.dart';
 import 'package:myapp/view/estilotitulo.dart';
+import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 
 class Capture extends StatefulWidget {
   const Capture({super.key});
@@ -20,7 +21,24 @@ class _CaptureState extends State<Capture> {
   final _acvController = TextEditingController();
   final _yearsController = TextEditingController();
   final _tcvController = TextEditingController();
-  final _marginController = TextEditingController();
+  final _marginController = TextEditingController();  
+  final _dateController = TextEditingController();
+
+  DateTime _selectedDate = DateTime.now();
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate,
+      firstDate: DateTime(2024),
+      lastDate: DateTime(2034),
+    );
+    if (picked != null && picked != _selectedDate) {
+      setState(() {
+        _selectedDate = picked;
+      });
+    }
+  }
 
   // Dropdowns
   String? _businessUnit;  
@@ -78,11 +96,14 @@ Future<void> saveCommercialOpportunity() async {
 }
 
 
-Future<String> _getLastOpportunityNumber() async {
-  final dataSave = DataSave();  
+// Function to get the last opportunity number
+Future<int> _getLastOpportunityNumber() async {
+  final dataSave = DataSave();
   final data = await dataSave.getLastOpportunity();
-  return data;
+  _lastOpportunityNumber = data;
+  return int.parse(_lastOpportunityNumber.substring(3));
 }
+
 
 
 
@@ -264,7 +285,19 @@ Future<String> _getLastOpportunityNumber() async {
                     return null;
                   },
                 ),
-        
+
+                Text(
+              'Fecha seleccionada: ${_selectedDate.toLocal()}'.split(' ')[0],
+              style: TextStyle(fontSize: 20),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () => _selectDate(context),
+              child: Text('Seleccionar fecha'),
+            ),
+           
+
+
                 // Years text field
                 TextFormField(
                   controller: _yearsController,
@@ -319,12 +352,39 @@ Future<String> _getLastOpportunityNumber() async {
                     if (_formKey.currentState!.validate()) {
                       // Process the form data
                       String clientCode = _clientCodeController.text;
-                      String acv = _acvController.text;
+                      double acv = double.parse(_acvController.text);
                       String years = _yearsController.text;
-                      String tcv = _tcvController.text;
-                      String margin = _marginController.text;
+                      double tcv = double.parse(_tcvController.text);
+                      double margin = double.parse(_marginController.text);                                            
+                      int lastOpportunityNumberInt = await _getLastOpportunityNumber();
+                      String lastOpportunityNumber = "OP-${lastOpportunityNumberInt + 1}";
 
-                      _lastOpportunityNumber = await _getLastOpportunityNumber();                      
+
+                      CommercialOpportunity opportunity = CommercialOpportunity(
+                        numeroOperacion: lastOpportunityNumber,
+                        cliente: clientCode,
+                        unidadNegocio: _businessUnit!,
+                        etapa: "S1",
+                        tipo: _type!,
+                        acv: acv,
+                        tcv: tcv,
+                        margenGanancia: margin,
+                        region: _region!,
+                        territorio: _territory!,
+                        industria: _industry!,
+                        fechaCreacion: "2023-04-26",
+                        fechaCierre: "2023-07-06",
+                        edadOferta: 71.0,
+                        fuentePrincipal: "LS-15",
+                        numeroVendedor: "NV-1",
+                      );
+
+                    final dataSave = DataSave();
+                    await dataSave.saveInfo(opportunity);
+
+
+
+                                            
                       print(_lastOpportunityNumber);
                       print('Client Code: $clientCode');
                       print('ACV: $acv');

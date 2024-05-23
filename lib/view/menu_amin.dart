@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/view/login.dart';
+import 'package:myapp/view/main_capture.dart';
 import 'package:myapp/view/validate_oportunity.dart';
 
 class AdminMenu extends StatelessWidget {
@@ -35,7 +36,7 @@ class AdminMenu extends StatelessWidget {
               title: Text('Registrar oportunidad'),
               onTap: () {
                 // Navega a la pantalla de registro de oportunidad
-                // Implementa esta navegación según tus necesidades
+                _navigateToMainCapture(context);
               },
             ),
             ListTile(
@@ -80,6 +81,14 @@ class AdminMenu extends StatelessWidget {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => CaptureCheck()),
+    );
+  }
+
+  //Navegar a main_capture
+  void _navigateToMainCapture(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const Capture()),
     );
   }
 }
