@@ -1,5 +1,7 @@
 
 import 'package:flutter/material.dart';
+import 'package:myapp/data/savedata.dart';
+import 'package:myapp/model/commercial_opportunity.dart';
 import 'package:myapp/view/dropdowncustom.dart';
 import 'package:myapp/view/estilotitulo.dart';
 
@@ -27,6 +29,63 @@ class _CaptureState extends State<Capture> {
   String? _territory;
   String? _industry;
   String? _idsealer;
+
+  String _lastOpportunityNumber = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _getLastOpportunityNumber();
+  }
+
+// Function to save Commercial Opportunity
+Future<void> saveCommercialOpportunity() async {
+  // Validate the form
+  
+    // Get the form data
+    String clientCode = _clientCodeController.text;
+    String acv = _acvController.text;
+    String years = _yearsController.text;
+    String tcv = _tcvController.text;
+    String margin = _marginController.text;
+    // Create a CommercialOpportunity object
+    CommercialOpportunity opportunity = CommercialOpportunity(
+      numeroOperacion: "OP-00016",
+      cliente: clientCode,
+      unidadNegocio: "CL-00509",
+      etapa: "S1",
+      tipo: "TY-05",
+      acv: 116683.82,
+      tcv: 116683.82,
+      margenGanancia: 0.22,
+      region: "RE-02",
+      territorio: "TE-01",
+      industria: "IN-41",
+      fechaCreacion: "2023-04-26",
+      fechaCierre: "2023-07-06",
+      edadOferta: 71.0,
+      fuentePrincipal: "LS-15",
+      numeroVendedor: "NV-1",
+    );
+
+    // Save the opportunity using the DataSave class
+    final dataSave = DataSave();
+    await dataSave.saveInfo(opportunity);
+
+    // Show a success message
+    print("Funciono correctamente");
+  
+}
+
+
+Future<String> _getLastOpportunityNumber() async {
+  final dataSave = DataSave();  
+  final data = await dataSave.getLastOpportunity();
+  return data;
+}
+
+
+
 
   List<String> opcionesUnidadNegocio=[
     'BU-01',
@@ -254,9 +313,24 @@ class _CaptureState extends State<Capture> {
                 const SizedBox(height: 20,),
                 // Submit button
                 ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
+                    print('presiono boton');
+                    saveCommercialOpportunity();
                     if (_formKey.currentState!.validate()) {
                       // Process the form data
+                      String clientCode = _clientCodeController.text;
+                      String acv = _acvController.text;
+                      String years = _yearsController.text;
+                      String tcv = _tcvController.text;
+                      String margin = _marginController.text;
+
+                      _lastOpportunityNumber = await _getLastOpportunityNumber();                      
+                      print(_lastOpportunityNumber);
+                      print('Client Code: $clientCode');
+                      print('ACV: $acv');
+                      print('Years: $years');
+                      print('TCV: $tcv');
+                      print('Margin: $margin');
                     }
                   },
                   child: const Text('Guardar Datos'),

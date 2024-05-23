@@ -30,9 +30,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  #Librerías para conectar a mongodb
   mongo_dart: ^0.8.0
-# Suggested code may be subject to a license. Learn more: ~LicenseLog:2433042971.
   realm: ^2.2.1  
 
   # The following adds the Cupertino Icons font to your application.
@@ -64,6 +62,10 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
+# Suggested code may be subject to a license. Learn more: ~LicenseLog:1147866284.
+# Suggested code may be subject to a license. Learn more: ~LicenseLog:3969207711.
+  assets:
+    - .env
   # assets:
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
