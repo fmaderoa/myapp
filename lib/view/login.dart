@@ -1,67 +1,89 @@
-// Suggested code may be subject to a license. Learn more: ~LicenseLog:2396887059.
-// Suggested code may be subject to a license. Learn more: ~LicenseLog:1802774011.
-// Import necessary libraries
 import 'package:flutter/material.dart';
-import 'package:myapp/view/main_capture.dart';
+import 'package:myapp/view/menu_amin.dart';
 
-// Define the LoginScreen class
 class LoginScreen extends StatelessWidget {
-  const LoginScreen({super.key});
+  const LoginScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final TextEditingController emailController = TextEditingController();
+    final TextEditingController passwordController = TextEditingController();
+
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Ingreso de usuarios'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: <Widget>[
-            // Email text field
-            const TextField(
-              decoration: InputDecoration(
-                labelText: 'Email',
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 64.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              Icon(
+                Icons.lock_outline,
+                size: 96.0,
+                color: Colors.blue,
               ),
-            ),
-
-            // Password text field
-            const TextField(
-              obscureText: true,
-              decoration: InputDecoration(
-                labelText: 'Password',
+              const SizedBox(height: 32.0),
+              Text(
+                'Bienvenido',
+                style: TextStyle(
+                  fontSize: 24.0,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
               ),
-            ),
-            const SizedBox(height: 16.0),
+              const SizedBox(height: 32.0),
+              TextFormField(
+                controller: emailController,
+                decoration: InputDecoration(
+                  labelText: 'Email',
+                  prefixIcon: Icon(Icons.email),
+                ),
+              ),
+              const SizedBox(height: 16.0),
+              TextFormField(
+                controller: passwordController,
+                obscureText: true,
+                decoration: InputDecoration(
+                  labelText: 'Password',
+                  prefixIcon: Icon(Icons.lock),
+                ),
+              ),
+              const SizedBox(height: 64.0),
+              ElevatedButton(
+                onPressed: () {
+                  final String email = emailController.text;
+                  final String password = passwordController.text;
 
-            // Login button
-            ElevatedButton(
-              onPressed: () {
-                //Ir a pantalla de captura
-                goToCapture(context);
-              },
-              child: const Text('Ingresar'),
-            ),
-
-            // Forgot password label
-            TextButton(
-              onPressed: () {
-                // Handle forgot password logic here
-              },
-              child: const Text('Olvido su password?'),
-            ),
-          ],
+                  if (email == 'admin@admin.com' && password == 'admin') {
+                    goToCapture(context);
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Credenciales incorrectas'),
+                        duration: Duration(seconds: 2),
+                      ),
+                    );
+                  }
+                },
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 16.0),
+                  child: Text(
+                    'Ingresar',
+                    style: TextStyle(fontSize: 20.0),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
-  
+
   void goToCapture(BuildContext context) {
-    //Ir a la pantalla Capture
-    Navigator.push(
+    Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => const Capture()),
+      MaterialPageRoute(builder: (context) => AdminMenu()),
     );
   }
 }
-
