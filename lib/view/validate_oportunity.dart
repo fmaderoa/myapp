@@ -18,18 +18,57 @@ class _CaptureState extends State<CaptureCheck> {
   final _clientCodeController = TextEditingController();
   void changeState (String response) {
     print("entra aca");
-    if (response == "Lost") {
+    if (response == "Won") {
       setState(() {
-        _isValidOportunity = -1;
+        _isValidOportunity = 1;
       });
     } else {
       setState(() {
-        _isValidOportunity = 1;
+        _isValidOportunity = -1;
       });
     }
   }
 
   final conn = RedisConnection();
+
+
+Future<String> connectToRedis(String key) async {
+  const redisHost = 'redis-17205.c245.us-east-1-3.ec2.redns.redis-cloud.com';
+  const redisPort = 17205;
+  const redisPassword = 'sTGiKr1gp3nrYoyXVPdv9zhdFW8H2eOC';
+
+  final connection = RedisConnection();
+  Command command;
+
+  try {
+    // Connect to Redis server
+    command = await connection.connect(redisHost, redisPort);
+
+    // Authenticate with the provided password
+    await command.send_object(['AUTH', redisPassword]);
+
+    print('Connected to Redis');
+
+    // Obtener el valor de la clave específica
+    var value = await command.send_object(['GET', key]);
+    changeState(value);
+    if (value == null) {      
+      print('La clave "$key" no existe en la base de datos.');
+      return "No existe";
+    } else {      
+      print('Valor de la clave "$key": $value');
+      return value;
+    }
+  } catch (e) {
+    print('Error: $e');
+    return "Error";
+  } finally {
+    // Close the connection
+    connection.close();
+  }
+}
+
+
 
 
 void _isValid(String clientCode) async {
@@ -105,7 +144,8 @@ void _isValid(String clientCode) async {
                   onPressed: () {
                     final String value = _clientCodeController.text;
                     if (_formKey.currentState!.validate()) {
-                      _isValid(value);
+                      connectToRedis(value);
+                      //_isValid(value);
                     }
                   },
                   child: const Text('Guardar Datos'),
@@ -113,7 +153,7 @@ void _isValid(String clientCode) async {
                 // Show the result of the validation
                 if (_isValidOportunity == 1)
                   const Text(
-                    'La oportunidad es válida',
+                    'hay probabilidad de ganar la oportunidad',
                     style: TextStyle(
                       color: Colors.green,
                       fontSize: 20,
@@ -122,7 +162,7 @@ void _isValid(String clientCode) async {
                   // Show the result of the validation when it is not valid
                 if (_isValidOportunity == -1)
                   const Text(
-                    'La oportunidad no es válida',
+                    'hay probabilidad de perder la oportunidad',
                     style: TextStyle(
                       color: Colors.red,
                       fontSize: 20,

@@ -78,7 +78,7 @@ class AdminMenu extends StatelessWidget {
 
   void _checkOportunity(BuildContext context) {
     // Navigate to login screen
-    Navigator.pushReplacement(
+    Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const CaptureCheck()),
     );

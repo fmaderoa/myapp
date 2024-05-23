@@ -402,6 +402,8 @@ void clearAllControllers() {
 
 
 
+
+
                       CommercialOpportunity opportunity = CommercialOpportunity(
                         numeroOperacion: lastOpportunityNumber,
                         cliente: clientCode,
@@ -420,7 +422,7 @@ void clearAllControllers() {
                         fuentePrincipal: _leadSource!,
                         numeroVendedor: _idsealer!,
                       );
-
+                      print(opportunity);
                       final dataSave = DataSave();
                       bool result = await dataSave.saveInfo(opportunity);
                       if (result) {
@@ -445,7 +447,7 @@ void clearAllControllers() {
                       }
                           
 
-                                            
+                      print('Industria es : $opportunity.industria');                      
                       print(_lastOpportunityNumber);
                       print('Client Code: $clientCode');
                       print('ACV: $acv');
