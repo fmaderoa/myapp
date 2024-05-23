@@ -40,6 +40,7 @@ dependencies:
   cupertino_icons: ^1.0.6
   dotenv: ^4.2.0
   flutter_dotenv: ^5.1.0
+  redis: ^4.0.0
 
 dev_dependencies:
   flutter_test:

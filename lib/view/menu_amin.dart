@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/view/login.dart';
+import 'package:myapp/view/validate_oportunity.dart';
 
 class AdminMenu extends StatelessWidget {
   const AdminMenu({Key? key}) : super(key: key);
@@ -43,6 +44,7 @@ class AdminMenu extends StatelessWidget {
               onTap: () {
                 // Navega a la pantalla de validación de resultados
                 // Implementa esta navegación según tus necesidades
+                _checkOportunity(context);
               },
             ),
             ListTile(
@@ -70,6 +72,14 @@ class AdminMenu extends StatelessWidget {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => LoginScreen()),
+    );
+  }
+
+  void _checkOportunity(BuildContext context) {
+    // Navigate to login screen
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => CaptureCheck()),
     );
   }
 }
