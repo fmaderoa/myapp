@@ -50,7 +50,7 @@ Future<void> saveCommercialOpportunity() async {
     String margin = _marginController.text;
     // Create a CommercialOpportunity object
     CommercialOpportunity opportunity = CommercialOpportunity(
-      numeroOperacion: "OP-00016",
+      numeroOperacion: "OP-13791",
       cliente: clientCode,
       unidadNegocio: "CL-00509",
       etapa: "S1",
