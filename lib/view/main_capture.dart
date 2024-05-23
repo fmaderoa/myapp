@@ -4,7 +4,7 @@ import 'package:myapp/data/savedata.dart';
 import 'package:myapp/model/commercial_opportunity.dart';
 import 'package:myapp/view/dropdowncustom.dart';
 import 'package:myapp/view/estilotitulo.dart';
-import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
+
 
 class Capture extends StatefulWidget {
   const Capture({super.key});
@@ -26,6 +26,13 @@ class _CaptureState extends State<Capture> {
 
   DateTime _selectedDate = DateTime.now();
 
+  @override
+  void initState() {
+    super.initState();
+    _getLastOpportunityNumber();
+    _dateController.text = "${_selectedDate.toLocal()}".split(' ')[0];
+  }
+
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -36,6 +43,7 @@ class _CaptureState extends State<Capture> {
     if (picked != null && picked != _selectedDate) {
       setState(() {
         _selectedDate = picked;
+        _dateController.text = "${_selectedDate.toLocal()}".split(' ')[0];
       });
     }
   }
@@ -47,14 +55,11 @@ class _CaptureState extends State<Capture> {
   String? _territory;
   String? _industry;
   String? _idsealer;
+  String? _leadSource;
+
 
   String _lastOpportunityNumber = '';
 
-  @override
-  void initState() {
-    super.initState();
-    _getLastOpportunityNumber();
-  }
 
 // Function to save Commercial Opportunity
 Future<void> saveCommercialOpportunity() async {
@@ -171,6 +176,39 @@ Future<int> _getLastOpportunityNumber() async {
     'NV-4',    
   ];
 
+  List<String> fuentePrincipal=[
+    'LS-00',
+    'LS-01',
+    'LS-02',
+    'LS-03',    
+    'LS-04',
+    'LS-05',
+    'LS-06',
+    'LS-07',
+    'LS-08',    
+    'LS-09',
+    'LS-10',
+  ];
+
+
+void clearAllControllers() {
+  _clientCodeController.clear();
+  _acvController.clear();
+  _yearsController.clear();
+  _tcvController.clear();
+  _marginController.clear();
+  _dateController.clear();
+  _businessUnit = null;
+  _type = null;
+  _region = null;
+  _territory = null;
+  _industry = null;
+  _idsealer = null;
+  _leadSource = null;
+}
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -286,33 +324,19 @@ Future<int> _getLastOpportunityNumber() async {
                   },
                 ),
 
-                Text(
-              'Fecha seleccionada: ${_selectedDate.toLocal()}'.split(' ')[0],
-              style: TextStyle(fontSize: 20),
+                Row( // Fila para la fecha y el botón
+          mainAxisSize: MainAxisSize.max,
+          children: <Widget>[
+            Text(
+              'Fecha cierre: ${_dateController.text}',
+              style: const TextStyle(fontSize: 20),
             ),
-            SizedBox(height: 20),
-            ElevatedButton(
+            IconButton( // Botón con icono de calendario
+              icon: const Icon(Icons.calendar_today),
               onPressed: () => _selectDate(context),
-              child: Text('Seleccionar fecha'),
             ),
-           
-
-
-                // Years text field
-                TextFormField(
-                  controller: _yearsController,
-                  keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
-                    labelText: 'Años',
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter the number of years';
-                    }
-                    return null;
-                  },
-                ),
-        
+          ],
+        ),
                 // TCV text field
                 TextFormField(
                   controller: _tcvController,
@@ -342,15 +366,28 @@ Future<int> _getLastOpportunityNumber() async {
                     return null;
                   },
                 ),
-        
+                //DropDown fuentePrincipal
+                DropDownCustom(
+                  listaDeOpciones: fuentePrincipal, 
+                  nombreColeccion: 'Lead Source', 
+                  onSelectedValue: (value) {                          
+                           _leadSource = value;                           
+                           setState(() {
+                             
+                           });
+            
+                          }, selectElement: _leadSource),
+
+
+
                 const SizedBox(height: 20,),
                 // Submit button
                 ElevatedButton(
                   onPressed: () async {
                     print('presiono boton');
-                    saveCommercialOpportunity();
                     if (_formKey.currentState!.validate()) {
                       // Process the form data
+                      print('Ingresa a validar datos');
                       String clientCode = _clientCodeController.text;
                       double acv = double.parse(_acvController.text);
                       String years = _yearsController.text;
@@ -358,6 +395,11 @@ Future<int> _getLastOpportunityNumber() async {
                       double margin = double.parse(_marginController.text);                                            
                       int lastOpportunityNumberInt = await _getLastOpportunityNumber();
                       String lastOpportunityNumber = "OP-${lastOpportunityNumberInt + 1}";
+                      DateTime now = DateTime.now();
+                      String formattedDate = "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
+                      int differenceInDays = DateTime.parse(_dateController.text).difference(now).inDays;
+                      double edadOferta = differenceInDays.toDouble();
+
 
 
                       CommercialOpportunity opportunity = CommercialOpportunity(
@@ -372,17 +414,36 @@ Future<int> _getLastOpportunityNumber() async {
                         region: _region!,
                         territorio: _territory!,
                         industria: _industry!,
-                        fechaCreacion: "2023-04-26",
-                        fechaCierre: "2023-07-06",
-                        edadOferta: 71.0,
-                        fuentePrincipal: "LS-15",
-                        numeroVendedor: "NV-1",
+                        fechaCreacion: formattedDate,
+                        fechaCierre: _dateController.text,
+                        edadOferta: edadOferta,
+                        fuentePrincipal: _leadSource!,
+                        numeroVendedor: _idsealer!,
                       );
 
-                    final dataSave = DataSave();
-                    await dataSave.saveInfo(opportunity);
-
-
+                      final dataSave = DataSave();
+                      bool result = await dataSave.saveInfo(opportunity);
+                      if (result) {
+                        print('Datos guardados correctamente');
+                        showDialog(
+                          // ignore: use_build_context_synchronously
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text('Éxito'),
+                            content: Text('La oportunidad comercial $_lastOpportunityNumber se guardo correctamente'),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: const Text('Aceptar'),                                
+                              ),
+                            ],
+                          ),
+                        );
+                        clearAllControllers();
+                      } else {
+                        print('Error al guardar los datos');
+                      }
+                          
 
                                             
                       print(_lastOpportunityNumber);

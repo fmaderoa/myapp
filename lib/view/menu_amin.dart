@@ -4,7 +4,7 @@ import 'package:myapp/view/main_capture.dart';
 import 'package:myapp/view/validate_oportunity.dart';
 
 class AdminMenu extends StatelessWidget {
-  const AdminMenu({Key? key}) : super(key: key);
+  const AdminMenu({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -12,14 +12,14 @@ class AdminMenu extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Menú de Administrador'),
       ),
-      body: Center(
+      body: const Center(
         child: Text('Contenido del menú de administrador'),
       ),
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
           children: <Widget>[
-            DrawerHeader(
+            const DrawerHeader(
               decoration: BoxDecoration(
                 color: Colors.blue,
               ),
@@ -32,16 +32,16 @@ class AdminMenu extends StatelessWidget {
               ),
             ),
             ListTile(
-              leading: Icon(Icons.add),
-              title: Text('Registrar oportunidad'),
+              leading: const Icon(Icons.add),
+              title: const Text('Registrar oportunidad'),
               onTap: () {
                 // Navega a la pantalla de registro de oportunidad
                 _navigateToMainCapture(context);
               },
             ),
             ListTile(
-              leading: Icon(Icons.check),
-              title: Text('Validar resultado'),
+              leading: const Icon(Icons.check),
+              title: const Text('Validar resultado'),
               onTap: () {
                 // Navega a la pantalla de validación de resultados
                 // Implementa esta navegación según tus necesidades
@@ -49,8 +49,8 @@ class AdminMenu extends StatelessWidget {
               },
             ),
             ListTile(
-              leading: Icon(Icons.exit_to_app),
-              title: Text('Cerrar sesión'),
+              leading: const Icon(Icons.exit_to_app),
+              title: const Text('Cerrar sesión'),
               onTap: () {
                 // Implementa aquí la lógica para cerrar sesión
                 _signOut(context);
@@ -72,7 +72,7 @@ class AdminMenu extends StatelessWidget {
     // Navigate to login screen
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => LoginScreen()),
+      MaterialPageRoute(builder: (context) => const LoginScreen()),
     );
   }
 
@@ -80,7 +80,7 @@ class AdminMenu extends StatelessWidget {
     // Navigate to login screen
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => CaptureCheck()),
+      MaterialPageRoute(builder: (context) => const CaptureCheck()),
     );
   }
 

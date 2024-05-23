@@ -64,7 +64,8 @@ void _isValid(String clientCode) async {
       print('Error: $e');
     } finally {
       // Ensure the connection is closed
-      await conn.close();
+      //Si conexión no es nula intente cerrar la conexión
+      //await conn.close();
     }
   }
 
@@ -89,7 +90,7 @@ void _isValid(String clientCode) async {
                 TextFormField(
                   controller: _clientCodeController,
                   decoration: const InputDecoration(
-                    labelText: 'Código de cliente',
+                    labelText: 'Número oportunidad',
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:myapp/view/menu_amin.dart';
 
 class LoginScreen extends StatelessWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+  const LoginScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -17,13 +17,13 @@ class LoginScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              Icon(
+              const Icon(
                 Icons.lock_outline,
                 size: 96.0,
                 color: Colors.blue,
               ),
               const SizedBox(height: 32.0),
-              Text(
+              const Text(
                 'Bienvenido',
                 style: TextStyle(
                   fontSize: 24.0,
@@ -34,7 +34,7 @@ class LoginScreen extends StatelessWidget {
               const SizedBox(height: 32.0),
               TextFormField(
                 controller: emailController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Email',
                   prefixIcon: Icon(Icons.email),
                 ),
@@ -43,7 +43,7 @@ class LoginScreen extends StatelessWidget {
               TextFormField(
                 controller: passwordController,
                 obscureText: true,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Password',
                   prefixIcon: Icon(Icons.lock),
                 ),
@@ -58,15 +58,15 @@ class LoginScreen extends StatelessWidget {
                     goToCapture(context);
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
+                      const SnackBar(
                         content: Text('Credenciales incorrectas'),
                         duration: Duration(seconds: 2),
                       ),
                     );
                   }
                 },
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 16.0),
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 16.0),
                   child: Text(
                     'Ingresar',
                     style: TextStyle(fontSize: 20.0),
@@ -83,7 +83,7 @@ class LoginScreen extends StatelessWidget {
   void goToCapture(BuildContext context) {
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => AdminMenu()),
+      MaterialPageRoute(builder: (context) => const AdminMenu()),
     );
   }
 }
