@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:myapp/data/validuser.dart';
 import 'package:myapp/view/login.dart';
 import 'package:myapp/view/main_capture.dart';
 import 'package:myapp/view/validate_oportunity.dart';
@@ -62,12 +63,13 @@ class AdminMenu extends StatelessWidget {
     );
   }
 
-  void _signOut(BuildContext context) {
+  void _signOut(BuildContext context) async {
     // Aquí puedes implementar la lógica para cerrar sesión
     // Esto podría ser un método que limpia las credenciales y navega a la pantalla de inicio de sesión
     // Por ejemplo:
     // Limpia las credenciales
     // Navigate back to login screen
+    await ValidUser().signOut();
     Navigator.pop(context); // Cerrar el menú desplegable
     // Navigate to login screen
     Navigator.pushReplacement(

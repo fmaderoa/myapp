@@ -1,10 +1,8 @@
-
 import 'package:flutter/material.dart';
 import 'package:myapp/data/savedata.dart';
 import 'package:myapp/model/commercial_opportunity.dart';
 import 'package:myapp/view/dropdowncustom.dart';
 import 'package:myapp/view/estilotitulo.dart';
-
 
 class Capture extends StatefulWidget {
   const Capture({super.key});
@@ -21,10 +19,11 @@ class _CaptureState extends State<Capture> {
   final _acvController = TextEditingController();
   final _yearsController = TextEditingController();
   final _tcvController = TextEditingController();
-  final _marginController = TextEditingController();  
+  final _marginController = TextEditingController();
   final _dateController = TextEditingController();
 
   DateTime _selectedDate = DateTime.now();
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -49,7 +48,7 @@ class _CaptureState extends State<Capture> {
   }
 
   // Dropdowns
-  String? _businessUnit;  
+  String? _businessUnit;
   String? _type;
   String? _region;
   String? _territory;
@@ -57,61 +56,88 @@ class _CaptureState extends State<Capture> {
   String? _idsealer;
   String? _leadSource;
 
-
   String _lastOpportunityNumber = '';
 
+  // Function to save Commercial Opportunity
+  Future<void> saveCommercialOpportunity() async {
+    if (_formKey.currentState!.validate()) {
+      setState(() {
+        _isLoading = true;
+      });
 
-// Function to save Commercial Opportunity
-Future<void> saveCommercialOpportunity() async {
-  // Validate the form
-  
-    // Get the form data
-    String clientCode = _clientCodeController.text;
-    String acv = _acvController.text;
-    String years = _yearsController.text;
-    String tcv = _tcvController.text;
-    String margin = _marginController.text;
-    // Create a CommercialOpportunity object
-    CommercialOpportunity opportunity = CommercialOpportunity(
-      numeroOperacion: "OP-13791",
-      cliente: clientCode,
-      unidadNegocio: "CL-00509",
-      etapa: "S1",
-      tipo: "TY-05",
-      acv: 116683.82,
-      tcv: 116683.82,
-      margenGanancia: 0.22,
-      region: "RE-02",
-      territorio: "TE-01",
-      industria: "IN-41",
-      fechaCreacion: "2023-04-26",
-      fechaCierre: "2023-07-06",
-      edadOferta: 71.0,
-      fuentePrincipal: "LS-15",
-      numeroVendedor: "NV-1",
-    );
+      // Get the form data
+      String clientCode = _clientCodeController.text;
+      String acv = _acvController.text;
+      String years = _yearsController.text;
+      String tcv = _tcvController.text;
+      String margin = _marginController.text;
+      int lastOpportunityNumberInt = await _getLastOpportunityNumber();
+      String lastOpportunityNumber = "OP-${lastOpportunityNumberInt + 1}";
+      DateTime now = DateTime.now();
+      String formattedDate = "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
+      int differenceInDays = DateTime.parse(_dateController.text).difference(now).inDays;
+      double edadOferta = differenceInDays.toDouble();
 
-    // Save the opportunity using the DataSave class
+      CommercialOpportunity opportunity = CommercialOpportunity(
+        numeroOperacion: lastOpportunityNumber,
+        cliente: clientCode,
+        unidadNegocio: _businessUnit!,
+        etapa: "S1",
+        tipo: _type!,
+        acv: double.parse(acv),
+        tcv: double.parse(tcv),
+        margenGanancia: double.parse(margin),
+        region: _region!,
+        territorio: _territory!,
+        industria: _industry!,
+        fechaCreacion: formattedDate,
+        fechaCierre: _dateController.text,
+        edadOferta: edadOferta,
+        fuentePrincipal: _leadSource!,
+        numeroVendedor: _idsealer!,
+      );
+
+      final dataSave = DataSave();
+      bool result = await dataSave.saveInfo(opportunity);
+
+      setState(() {
+        _isLoading = false;
+      });
+
+      if (result) {
+        showDialog(
+          // ignore: use_build_context_synchronously
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Éxito'),
+            content: Text('La oportunidad comercial $lastOpportunityNumber se guardó correctamente'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Aceptar'),
+              ),
+            ],
+          ),
+        );
+        clearAllControllers();
+      } else {
+        // ignore: use_build_context_synchronously
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Error al guardar los datos'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    }
+  }
+
+  Future<int> _getLastOpportunityNumber() async {
     final dataSave = DataSave();
-    await dataSave.saveInfo(opportunity);
-
-    // Show a success message
-    print("Funciono correctamente");
-  
-}
-
-
-// Function to get the last opportunity number
-Future<int> _getLastOpportunityNumber() async {
-  final dataSave = DataSave();
-  final data = await dataSave.getLastOpportunity();
-  _lastOpportunityNumber = data;
-  return int.parse(_lastOpportunityNumber.substring(3));
-}
-
-
-
-
+    final data = await dataSave.getLastOpportunity();
+    _lastOpportunityNumber = data;
+    return int.parse(_lastOpportunityNumber.substring(3));
+  }
 
   List<String> opcionesUnidadNegocio=[
     'BU-01',
@@ -191,24 +217,21 @@ Future<int> _getLastOpportunityNumber() async {
   ];
 
 
-void clearAllControllers() {
-  _clientCodeController.clear();
-  _acvController.clear();
-  _yearsController.clear();
-  _tcvController.clear();
-  _marginController.clear();
-  _dateController.clear();
-  _businessUnit = null;
-  _type = null;
-  _region = null;
-  _territory = null;
-  _industry = null;
-  _idsealer = null;
-  _leadSource = null;
-}
-
-
-
+  void clearAllControllers() {
+    _clientCodeController.clear();
+    _acvController.clear();
+    _yearsController.clear();
+    _tcvController.clear();
+    _marginController.clear();
+    _dateController.clear();
+    _businessUnit = null;
+    _type = null;
+    _region = null;
+    _territory = null;
+    _industry = null;
+    _idsealer = null;
+    _leadSource = null;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -216,254 +239,173 @@ void clearAllControllers() {
       appBar: AppBar(
         title: const Text('TABD'),
       ),
-      body: SingleChildScrollView(
-        child: Form(
-          key: _formKey,
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              children: [
-                const SizedBox(height: 20,),
-                const EstiloTitulo(textoTitulo: 'Ingrese los datos'),      
-                const SizedBox(height: 30,),
-                // Client code text field
-                TextFormField(
-                  controller: _clientCodeController,
-                  decoration: const InputDecoration(
-                    labelText: 'Código de cliente',
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Por favor ingrese un código';
-                    }
-                    return null;
-                  },
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            child: Form(
+              key: _formKey,
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                    const SizedBox(height: 20),
+                    const EstiloTitulo(textoTitulo: 'Ingrese los datos'),
+                    const SizedBox(height: 30),
+                    TextFormField(
+                      controller: _clientCodeController,
+                      decoration: const InputDecoration(
+                        labelText: 'Código de cliente',
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Por favor ingrese un código';
+                        }
+                        return null;
+                      },
+                    ),
+                    DropDownCustom(
+                      listaDeOpciones: opcionesUnidadNegocio,
+                      nombreColeccion: 'Unidad de negocio',
+                      onSelectedValue: (value) {
+                        _businessUnit = value;
+                        setState(() {});
+                      },
+                      selectElement: _businessUnit,
+                    ),
+                    DropDownCustom(
+                      listaDeOpciones: tipos,
+                      nombreColeccion: 'Tipo',
+                      onSelectedValue: (value) {
+                        _type = value;
+                        setState(() {});
+                      },
+                      selectElement: _type,
+                    ),
+                    DropDownCustom(
+                      listaDeOpciones: regiones,
+                      nombreColeccion: 'Región',
+                      onSelectedValue: (value) {
+                        _region = value;
+                        setState(() {});
+                      },
+                      selectElement: _region,
+                    ),
+                    DropDownCustom(
+                      listaDeOpciones: territorios,
+                      nombreColeccion: 'Territorio',
+                      onSelectedValue: (value) {
+                        _territory = value;
+                        setState(() {});
+                      },
+                      selectElement: _territory,
+                    ),
+                    DropDownCustom(
+                      listaDeOpciones: industrias,
+                      nombreColeccion: 'Industria',
+                      onSelectedValue: (value) {
+                        _industry = value;
+                        setState(() {});
+                      },
+                      selectElement: _industry,
+                    ),
+                    DropDownCustom(
+                      listaDeOpciones: vendedores,
+                      nombreColeccion: 'Vendedor',
+                      onSelectedValue: (value) {
+                        _idsealer = value;
+                        setState(() {});
+                      },
+                      selectElement: _idsealer,
+                    ),
+                    TextFormField(
+                      controller: _acvController,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(
+                        labelText: 'ACV',
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter an ACV';
+                        }
+                        return null;
+                      },
+                    ),
+                    Row(
+                      mainAxisSize: MainAxisSize.max,
+                      children: <Widget>[
+                        Text(
+                          'Fecha cierre: ${_dateController.text}',
+                          style: const TextStyle(fontSize: 20),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.calendar_today),
+                          onPressed: () => _selectDate(context),
+                        ),
+                      ],
+                    ),
+                    TextFormField(
+                      controller: _tcvController,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(
+                        labelText: 'TCV',
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter a TCV';
+                        }
+                        return null;
+                      },
+                    ),
+                    TextFormField(
+                      controller: _marginController,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(
+                        labelText: 'Margen',
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter a margin';
+                        }
+                        return null;
+                      },
+                    ),
+                    DropDownCustom(
+                      listaDeOpciones: fuentePrincipal,
+                      nombreColeccion: 'Lead Source',
+                      onSelectedValue: (value) {
+                        _leadSource = value;
+                        setState(() {});
+                      },
+                      selectElement: _leadSource,
+                    ),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: saveCommercialOpportunity,
+                      child: const Text('Guardar Datos'),
+                    ),
+                  ],
                 ),
-                // Business unit dropdown
-                DropDownCustom(
-                  listaDeOpciones: opcionesUnidadNegocio, 
-                  nombreColeccion: 'Unidad de negocio', 
-                  onSelectedValue: (value) {                          
-                           _businessUnit = value;                           
-                           setState(() {
-                             
-                           });
-            
-                          }, selectElement: _businessUnit,),
-                //DropDownCustom tipos
-                DropDownCustom(
-                  listaDeOpciones: tipos, 
-                  nombreColeccion: 'Tipo', 
-                  onSelectedValue: (value) {                          
-                           _type = value;                           
-                           setState(() {
-                             
-                           });
-            
-                          }, selectElement: _type,),
-                //DropDownCustom regiones
-                DropDownCustom(
-                  listaDeOpciones: regiones, 
-                  nombreColeccion: 'Región', 
-                  onSelectedValue: (value) {                          
-                           _region = value;                           
-                           setState(() {
-                             
-                           });
-            
-                          }, selectElement: _region,),
-                //DropDownCustom territorios
-                DropDownCustom(
-                  listaDeOpciones: territorios, 
-                  nombreColeccion: 'Territorio', 
-                  onSelectedValue: (value) {                          
-                           _territory = value;                           
-                           setState(() {
-                             
-                           });
-            
-                          }, selectElement: _territory),
-
-                //DropDownCustom industrias
-                DropDownCustom(
-                  listaDeOpciones: industrias, 
-                  nombreColeccion: 'Industria', 
-                  onSelectedValue: (value) {                          
-                           _industry = value;                           
-                           setState(() {
-                             
-                           });
-            
-                          }, selectElement: _industry),
-                //DropDownCustom vendedores
-                DropDownCustom(
-                  listaDeOpciones: vendedores, 
-                  nombreColeccion: 'Vendedor', 
-                  onSelectedValue: (value) {                          
-                           _idsealer = value;                           
-                           setState(() {
-                             
-                           });
-            
-                          }, selectElement: _idsealer),
-
-                
-        
-                // ACV text field
-                TextFormField(
-                  controller: _acvController,
-                  keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
-                    labelText: 'ACV',
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter an ACV';
-                    }
-                    return null;
-                  },
-                ),
-
-                Row( // Fila para la fecha y el botón
-          mainAxisSize: MainAxisSize.max,
-          children: <Widget>[
-            Text(
-              'Fecha cierre: ${_dateController.text}',
-              style: const TextStyle(fontSize: 20),
-            ),
-            IconButton( // Botón con icono de calendario
-              icon: const Icon(Icons.calendar_today),
-              onPressed: () => _selectDate(context),
-            ),
-          ],
-        ),
-                // TCV text field
-                TextFormField(
-                  controller: _tcvController,
-                  keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
-                    labelText: 'TCV',    
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter a TCV';
-                    }
-                    return null;
-                  },
-                ),
-        
-                // Margin text field
-                TextFormField(
-                  controller: _marginController,
-                  keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
-                    labelText: 'Margen',
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter a margin';
-                    }
-                    return null;
-                  },
-                ),
-                //DropDown fuentePrincipal
-                DropDownCustom(
-                  listaDeOpciones: fuentePrincipal, 
-                  nombreColeccion: 'Lead Source', 
-                  onSelectedValue: (value) {                          
-                           _leadSource = value;                           
-                           setState(() {
-                             
-                           });
-            
-                          }, selectElement: _leadSource),
-
-
-
-                const SizedBox(height: 20,),
-                // Submit button
-                ElevatedButton(
-                  onPressed: () async {
-                    print('presiono boton');
-                    if (_formKey.currentState!.validate()) {
-                      // Process the form data
-                      print('Ingresa a validar datos');
-                      String clientCode = _clientCodeController.text;
-                      double acv = double.parse(_acvController.text);
-                      String years = _yearsController.text;
-                      double tcv = double.parse(_tcvController.text);
-                      double margin = double.parse(_marginController.text);                                            
-                      int lastOpportunityNumberInt = await _getLastOpportunityNumber();
-                      String lastOpportunityNumber = "OP-${lastOpportunityNumberInt + 1}";
-                      DateTime now = DateTime.now();
-                      String formattedDate = "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
-                      int differenceInDays = DateTime.parse(_dateController.text).difference(now).inDays;
-                      double edadOferta = differenceInDays.toDouble();
-
-
-
-
-
-                      CommercialOpportunity opportunity = CommercialOpportunity(
-                        numeroOperacion: lastOpportunityNumber,
-                        cliente: clientCode,
-                        unidadNegocio: _businessUnit!,
-                        etapa: "S1",
-                        tipo: _type!,
-                        acv: acv,
-                        tcv: tcv,
-                        margenGanancia: margin,
-                        region: _region!,
-                        territorio: _territory!,
-                        industria: _industry!,
-                        fechaCreacion: formattedDate,
-                        fechaCierre: _dateController.text,
-                        edadOferta: edadOferta,
-                        fuentePrincipal: _leadSource!,
-                        numeroVendedor: _idsealer!,
-                      );
-                      print(opportunity);
-                      final dataSave = DataSave();
-                      bool result = await dataSave.saveInfo(opportunity);
-                      if (result) {
-                        print('Datos guardados correctamente');
-                        showDialog(
-                          // ignore: use_build_context_synchronously
-                          context: context,
-                          builder: (context) => AlertDialog(
-                            title: const Text('Éxito'),
-                            content: Text('La oportunidad comercial $_lastOpportunityNumber se guardo correctamente'),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(context),
-                                child: const Text('Aceptar'),                                
-                              ),
-                            ],
-                          ),
-                        );
-                        clearAllControllers();
-                      } else {
-                        print('Error al guardar los datos');
-                      }
-                          
-
-                      print('Industria es : $opportunity.industria');                      
-                      print(_lastOpportunityNumber);
-                      print('Client Code: $clientCode');
-                      print('ACV: $acv');
-                      print('Years: $years');
-                      print('TCV: $tcv');
-                      print('Margin: $margin');
-                    }
-                  },
-                  child: const Text('Guardar Datos'),
-                ),
-              ],
+              ),
             ),
           ),
-        ),
+          if (_isLoading)
+            Center(
+              child: Container(
+                width: 100,
+                height: 100,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Center(
+                  child: CircularProgressIndicator(
+                    strokeWidth: 6.0,
+                  ),
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }
 }
-
